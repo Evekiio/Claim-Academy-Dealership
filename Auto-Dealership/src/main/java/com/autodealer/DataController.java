@@ -1,6 +1,12 @@
 package com.autodealer;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -26,17 +33,14 @@ public class DataController extends HttpServlet
 	DATABASE QUERIES & DATABASE MANIPULATION METHODS
 	*************************************************/
 	// Connect to Database (Verify & Validate Connection)
-	public static void connectToDatabase()
+	private Connection connect()
 	{
 		Connection conn = null;
 		String dataFileLocation = "jdbc:sqlite:C:\\Users\\sande\\Desktop\\Claim-Academy-Dealership\\Auto-Dealership\\src\\main\\java\\com\\connection\\database.db";
 	
 		try
 		{
-			conn = DriverManager.getConnection(dataFileLocation);
-			
-			System.out.println("Connection to SQLite Database has been established.");
-			
+			conn = DriverManager.getConnection(dataFileLocation);	
 		} 
 		
 		catch (SQLException e)
@@ -44,21 +48,7 @@ public class DataController extends HttpServlet
 			System.out.println("Connection Failed: " + e.getMessage());
 		}
 		
-		finally
-		{
-			try
-			{
-				if (conn != null)
-				{
-					conn.close();
-				}
-			}
-			
-			catch (SQLException e)
-			{
-				System.out.println("Connection Failed: " + e.getMessage());
-			}
-		}
+		return conn;
 	}
 
 	// Entry point for user.
@@ -86,13 +76,16 @@ public class DataController extends HttpServlet
 			statement = conn.createStatement();
 			
 			// Database condition : WHERE Condition = 0 (NEW)
-			ResultSet rs = statement.executeQuery("SELECT * FROM Inventory WHERE Condition = 0;");
+			ResultSet rs = statement.executeQuery("SELECT * FROM Inventory WHERE ImgCount = 1;");
 			
 			// Clear inventory before repopulating with database information. (Prevents Duplicate Data within List) 
 			inventory.clear();
 			
+			String fileName = null;
+			String directory = System.getProperty("user.dir");
 			while (rs.next())
 			{
+				
 				// Instantiate a Vehicle Object
 				Vehicle vehicle = new Vehicle(
 						rs.getInt("Identifier"),
@@ -111,11 +104,42 @@ public class DataController extends HttpServlet
 						rs.getInt("Condition")
 						);
 				
+				// READ BYTE FROM BLOB IN DATABASE
+				InputStream imageInput = rs.getBinaryStream("Image");
+				
+				// Name the file based of the Primary Key in Database
+				fileName = String.valueOf(vehicle.getId());
+				
+				
+				
+				String imageLocation = directory + "\\src\\main\\resources\\static\\images\\" + fileName + ".png";
+				String imageLocationRef = "\\images\\" + fileName + ".png";
+				
+				// Create New Image if it is missing...
+				File file = new File(imageLocation);
+				
+				
+				FileOutputStream outputStream = new FileOutputStream(file);
+				byte[] buffer = new byte[1024];
+				
+				while(imageInput.read(buffer) > 0)
+				{
+					outputStream.write(buffer);
+				}
+				
+				vehicle.setPhotoLocation(imageLocationRef);
+				
 				// Add the vehicle to the inventory (List of Vehicles)
 				inventory.add(vehicle);
+				outputStream.close();
+				
+				
+				
+				
 			}
 			
 			conn.close();
+			
 		}
 		catch (Exception e)
 		{
@@ -256,8 +280,8 @@ public class DataController extends HttpServlet
 		getAllInventory(searchData);
 	}
 
-	// TESTING THYMELEAF TEMPLATES
-	@GetMapping("/test")
+	// Retrieves Data depending on User Selections
+	@GetMapping("/reports")
 	public Model returnTest(Model model)
 	{
 		Connection conn = null;
@@ -310,4 +334,57 @@ public class DataController extends HttpServlet
 		model.addAttribute("inventory", inventory);
 		return model;
 	}
+	
+	// Uploads Image to Database
+	@GetMapping("/add-image")
+	public void testAddImage()
+		{
+			int id = 10;
+			String imageLocation = "C:\\Users\\sande\\Desktop\\capture.PNG";
+			String updateQuery = "UPDATE Inventory SET Image = ?, ImgCount = 1 WHERE Identifier = ?";
+			
+			try(Connection conn = connect(); PreparedStatement statement = conn.prepareStatement(updateQuery))
+			{
+				statement.setBytes(1, readImage(imageLocation));
+				statement.setInt(2, id);
+				
+				statement.executeUpdate();
+				System.out.println("Image Stored...");
+			}
+			catch (SQLException e)
+			{
+				System.out.println(e.getMessage());
+			}
+		}
+
+	// Read Image to Bytes
+	private byte[] readImage(String file)
+	{
+		ByteArrayOutputStream outputStream = null;
+		
+		try
+		{
+			File imageFile = new File(file);
+			FileInputStream inputStream = new FileInputStream(imageFile);
+			byte[] buffer = new byte[1024];
+			outputStream = new ByteArrayOutputStream();
+			
+			for (int len; (len = inputStream.read(buffer)) != -1;)
+			{
+				outputStream.write(buffer, 0, len);
+			}
+		}
+		catch(FileNotFoundException e1)
+		{
+			System.err.println(e1.getMessage());
+		}
+		catch(IOException e2)
+		{
+			System.err.println(e2.getMessage());
+		}
+		
+		return outputStream != null ? outputStream.toByteArray() : null;
+	}
+
+	
 }

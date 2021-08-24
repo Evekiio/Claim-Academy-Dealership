@@ -16,6 +16,7 @@ public class Vehicle
 	private String acquired;
 	private int imageCount;
 	private int condition;
+	private String photoLocation;
 	
 	public Vehicle(int id, int year, String manufacturer, String type, String trim, int mileage, String exterior, String interior, String drivetrain, int price, String details, String acquired, int imageCount, int condition)
 	{
@@ -35,8 +36,6 @@ public class Vehicle
 		this.imageCount = imageCount;
 		this.condition = condition;
 	}
-
-
 
 	public int getId()
 	{
@@ -177,4 +176,21 @@ public class Vehicle
 	{
 		this.condition = condition;
 	}
+
+	public String getPhotoLocation()
+	{
+		return photoLocation;
+	}
+
+	public void setPhotoLocation(String photoLocation)
+	{
+		this.photoLocation = photoLocation;
+	}
+
+	public void setType(String type)
+	{
+		this.type = type;
+	}
+	
+	
 }
