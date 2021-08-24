@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import javax.servlet.http.HttpServlet;
@@ -76,13 +77,20 @@ public class DataController extends HttpServlet
 			statement = conn.createStatement();
 			
 			// Database condition : WHERE Condition = 0 (NEW)
-			ResultSet rs = statement.executeQuery("SELECT * FROM Inventory WHERE ImgCount = 1;");
+			ResultSet rs = statement.executeQuery("SELECT * FROM Inventory WHERE Condition = 0;");
 			
 			// Clear inventory before repopulating with database information. (Prevents Duplicate Data within List) 
 			inventory.clear();
 			
 			String fileName = null;
 			String directory = System.getProperty("user.dir");
+			
+			// Get todays Julian Date in YYDDD format...
+			String currentJulianDate = LocalDate.now().getYear() + "" + LocalDate.now().getDayOfYear();
+			
+	
+			
+			
 			while (rs.next())
 			{
 				
@@ -100,9 +108,12 @@ public class DataController extends HttpServlet
 						rs.getInt("Price"),
 						rs.getString("Details"),
 						rs.getString("Acquired"),
+						rs.getInt("AuctionDate"),
 						rs.getInt("ImgCount"),
 						rs.getInt("Condition")
 						);
+				
+				vehicle.setAuctionDate(Integer.parseInt(currentJulianDate) - Integer.parseInt(vehicle.getAcquired()));
 				
 				// READ BYTE FROM BLOB IN DATABASE
 				InputStream imageInput = rs.getBinaryStream("Image");
@@ -131,21 +142,16 @@ public class DataController extends HttpServlet
 				
 				// Add the vehicle to the inventory (List of Vehicles)
 				inventory.add(vehicle);
-				outputStream.close();
-				
-				
-				
-				
+				outputStream.close();		
 			}
-			
 			conn.close();
-			
 		}
 		catch (Exception e)
 		{
 			System.out.println("Error: " + e.getMessage());
 		}
 		
+		// Add the attributes to the model.
 		model.addAttribute("inventory", inventory);
 		return model;
 	}
@@ -167,14 +173,24 @@ public class DataController extends HttpServlet
 			
 			statement = conn.createStatement();
 			
-			// Database condition : WHERE Condition = 1 (USED)
+			// Database condition : WHERE Condition = 0 (NEW)
 			ResultSet rs = statement.executeQuery("SELECT * FROM Inventory WHERE Condition = 1;");
 			
 			// Clear inventory before repopulating with database information. (Prevents Duplicate Data within List) 
 			inventory.clear();
 			
+			String fileName = null;
+			String directory = System.getProperty("user.dir");
+			
+			// Get todays Julian Date in YYDDD format...
+			String currentJulianDate = LocalDate.now().getYear() + "" + LocalDate.now().getDayOfYear();
+			
+	
+			
+			
 			while (rs.next())
 			{
+				
 				// Instantiate a Vehicle Object
 				Vehicle vehicle = new Vehicle(
 						rs.getInt("Identifier"),
@@ -189,14 +205,42 @@ public class DataController extends HttpServlet
 						rs.getInt("Price"),
 						rs.getString("Details"),
 						rs.getString("Acquired"),
+						rs.getInt("AuctionDate"),
 						rs.getInt("ImgCount"),
 						rs.getInt("Condition")
 						);
 				
+				vehicle.setAuctionDate(Integer.parseInt(currentJulianDate) - Integer.parseInt(vehicle.getAcquired()));
+				
+				// READ BYTE FROM BLOB IN DATABASE
+				InputStream imageInput = rs.getBinaryStream("Image");
+				
+				// Name the file based of the Primary Key in Database
+				fileName = String.valueOf(vehicle.getId());
+				
+				
+				
+				String imageLocation = directory + "\\src\\main\\resources\\static\\images\\" + fileName + ".png";
+				String imageLocationRef = "\\images\\" + fileName + ".png";
+				
+				// Create New Image if it is missing...
+				File file = new File(imageLocation);
+				
+				
+				FileOutputStream outputStream = new FileOutputStream(file);
+				byte[] buffer = new byte[1024];
+				
+				while(imageInput.read(buffer) > 0)
+				{
+					outputStream.write(buffer);
+				}
+				
+				vehicle.setPhotoLocation(imageLocationRef);
+				
 				// Add the vehicle to the inventory (List of Vehicles)
 				inventory.add(vehicle);
+				outputStream.close();		
 			}
-			
 			conn.close();
 		}
 		catch (Exception e)
@@ -204,6 +248,7 @@ public class DataController extends HttpServlet
 			System.out.println("Error: " + e.getMessage());
 		}
 		
+		// Add the attributes to the model.
 		model.addAttribute("inventory", inventory);
 		return model;
 	}
@@ -303,25 +348,25 @@ public class DataController extends HttpServlet
 			while (rs.next())
 			{
 				// Instantiate a Vehicle Object
-				Vehicle vehicle = new Vehicle(
-						rs.getInt("Identifier"),
-						rs.getInt("Year"),
-						rs.getString("Manufacturer"),
-						rs.getString("Type"),
-						rs.getString("Trim"),
-						rs.getInt("Mileage"),
-						rs.getString("Exterior"),
-						rs.getString("Interior"),
-						rs.getString("Drivetrain"),
-						rs.getInt("Price"),
-						rs.getString("Details"),
-						rs.getString("Acquired"),
-						rs.getInt("ImgCount"),
-						rs.getInt("Condition")
-						);
+//				Vehicle vehicle = new Vehicle(
+//						rs.getInt("Identifier"),
+//						rs.getInt("Year"),
+//						rs.getString("Manufacturer"),
+//						rs.getString("Type"),
+//						rs.getString("Trim"),
+//						rs.getInt("Mileage"),
+//						rs.getString("Exterior"),
+//						rs.getString("Interior"),
+//						rs.getString("Drivetrain"),
+//						rs.getInt("Price"),
+//						rs.getString("Details"),
+//						rs.getString("Acquired"),
+//						rs.getInt("ImgCount"),
+//						rs.getInt("Condition")
+//						);
 				
 				// Add the vehicle to the inventory (List of Vehicles)
-				inventory.add(vehicle);
+//				inventory.add(vehicle);
 			}
 			
 			conn.close();
@@ -339,7 +384,7 @@ public class DataController extends HttpServlet
 	@GetMapping("/add-image")
 	public void testAddImage()
 		{
-			int id = 10;
+			int id = 20;
 			String imageLocation = "C:\\Users\\sande\\Desktop\\capture.PNG";
 			String updateQuery = "UPDATE Inventory SET Image = ?, ImgCount = 1 WHERE Identifier = ?";
 			

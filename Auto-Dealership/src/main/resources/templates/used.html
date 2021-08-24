@@ -4,15 +4,24 @@
 <html xmlns:th="https://www.thymeleaf.org">
 	<head>
 		<meta charset="ISO-8859-1">
-		<!-- Latest compiled and minified CSS -->
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+		<!-- BOOTSTRAP 5 -->
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 		<title>Auto Dealer >> Used Inventory</title>
+		
+		<script>
+			$(document).ready(function(){$('[data-bs-toggle="popover"]').popover({html:true});});
+		</script>
+		
 	</head>
 	
 	<body>
 		<!-- BOOTSTRAP NAVIGATION COMPONENTS -->
 		<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-			<a class="navbar-brand" href="/index" style="text-transform: uppercase; letter-spacing: 3px; font-weight: 600;">Auto Dealer</a>
+			
+			<a class="navbar-brand" href="/index" style="text-transform: uppercase; letter-spacing: 3px; font-weight: 600; padding-left: 10px;">Auto Dealer</a>
 			
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
@@ -30,43 +39,79 @@
 					<a class="nav-link" href="#">Search</a>
 					</li>
 					<li class="nav-item">
-					<a class="nav-link" href="/test">Reports</a>
+					<a class="nav-link" href="/reports">Reports</a>
 					</li>
 				</ul>
 			</div>
 		</nav>
+
 		<br>
 		<br>
 
 		<!-- VEHICLE LISTINGS AS CARD GALLERY -->
-		<div class="album py-5 bg-light">
-			<div class="container">
+		<div class="album py-4 bg-light">
+			<div class="container" style="padding:0px;">
 				<div class="row">
 					<div class="col-md-4" th:each="vehicle : ${inventory}">
+						
+						<!-- INDIVIDUAL CARD VARIABLES AND STYLIZATION -->	
 						<div class="card mb-4 box-shadow" id="card-sizing">
-							<div class="test" th:text="${vehicle.condition} ? 'USED' : 'NEW'"></div>
-							<img class="card-img-top" data-src="holder.js/100px225?theme=thumb&amp;bg=55595c&amp;fg=eceeef&amp;text=Thumbnail" alt="Thumbnail [100%x225]" style="height: 225px; width: 100%; display: block;" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22348%22%20height%3D%22225%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20348%20225%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_17b74998acd%20text%20%7B%20fill%3A%23eceeef%3Bfont-weight%3Abold%3Bfont-family%3AArial%2C%20Helvetica%2C%20Open%20Sans%2C%20sans-serif%2C%20monospace%3Bfont-size%3A17pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_17b74998acd%22%3E%3Crect%20width%3D%22348%22%20height%3D%22225%22%20fill%3D%22%2355595c%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22116.70000076293945%22%20y%3D%22120.3%22%3EThumbnail%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E" data-holder-rendered="true">
-							<div class="card-body">
-							<p class="card-text">
-							<span th:text="${vehicle.year}"></span>
-							<span th:text="${vehicle.manufacturer}"></span>
-							<span th:text="${vehicle.type}"></span>
-							</p>
-							<p>Testing</p>
+							<div class="card-flag" style="position: absolute; left: 5px; top: -3px; color: rgb(255,255,255); font-weight: 600;" th:text="${vehicle.condition} ? 'USED' : 'NEW'"></div>
+							<img class="card-img-top" alt="Image Missing..." style="height: 225px; width: 100%; display: block; object-fit: cover;" th:src="${vehicle.photoLocation}" data-holder-rendered="true"/>
+							<div class="card-body" style="position: relative; padding: 5px;">
+								<h5 class="card-title">
+									<span th:text="${vehicle.year}"></span> - 
+									<span th:text="${vehicle.manufacturer}"></span>
+									<span th:text="${vehicle.type}"></span>
+								</h5>
+								
+								<p class="card-text" style="position: relative; top: -10px;">
+									Mileage: <span th:text="${vehicle.mileage}"></span><br>
+									Price: $<span th:text="${vehicle.price}"></span>
+								</p>
+								
 								<div class="d-flex justify-content-between align-items-center">
-									<div class="btn-group">
-										<button class="btn btn-sm btn-outline-secondary" type="button">Details</button>
-										<button class="btn btn-sm btn-outline-secondary" type="button">Bid</button>
+									
+									<div style="position: relative; width: 100px;">
+										<button class="btn btn-primary btn-sm" 
+												style="width:100px;" 
+												type="button" 
+												data-bs-trigger="focus" 
+												data-bs-toggle="popover" 
+												th:title="'<strong>' + ${vehicle.year} + ' ' + ${vehicle.manufacturer} + ' ' + ${vehicle.type} + '</strong>'" 
+												data-html="true" 
+												th:attr="data-bs-content='<strong>Trim: </strong>' + ${vehicle.trim} +
+																	 '<br><strong>Condition: </strong>' + ${vehicle.condition} + 
+																     '<br><strong>Mileage: </strong>' + ${vehicle.mileage} + 
+																	 '<br><strong>Exterior: </strong>' + ${vehicle.exterior} +
+																	 '<br><strong>Interior: </strong>' + ${vehicle.interior} + 
+																	 '<br><strong>Drivetrain: </strong>' + ${vehicle.drivetrain} +
+																	 '<br><strong>Price: </strong>$' + ${vehicle.price} +
+																	 '<br><strong>Date Acquired: </strong>' + ${vehicle.acquired} +
+																	 '<br><br><strong>Details: </strong>' + ${vehicle.details}">Details</button>
+										
+										<div style="height: 5px;"></div>
+										
+										<span th:if="${vehicle.auctionDate < 120}">
+											<button class="btn btn-success btn-sm" style="width:100px;" type="button">Buy</button>
+										</span>
+										
+										<span th:if="${vehicle.auctionDate >= 120}">
+											<button class="btn btn-danger btn-sm" style="width:100px;" type="button">Bid</button>
+										</span>		
 									</div>
-									<small class="text-muted">Current</small>
+									
+									<small class="text-muted" style="position: absolute; bottom: 0px; right:5px; float: right;">Days Listed: <span th:text="${vehicle.auctionDate}"></span></small>
 								</div>
 							</div>
+
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 		
+		<!-- FOOTER CONTAINER -->
 		<div class="footer"></div>
 </body>
 </html>

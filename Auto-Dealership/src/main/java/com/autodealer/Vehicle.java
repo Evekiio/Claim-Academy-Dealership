@@ -14,11 +14,12 @@ public class Vehicle
 	private int price;
 	private String details;
 	private String acquired;
+	private int auctionDate;
 	private int imageCount;
 	private int condition;
 	private String photoLocation;
 	
-	public Vehicle(int id, int year, String manufacturer, String type, String trim, int mileage, String exterior, String interior, String drivetrain, int price, String details, String acquired, int imageCount, int condition)
+	public Vehicle(int id, int year, String manufacturer, String type, String trim, int mileage, String exterior, String interior, String drivetrain, int price, String details, String acquired, int auctionDate, int imageCount, int condition)
 	{
 		super();
 		this.id = id;
@@ -33,6 +34,7 @@ public class Vehicle
 		this.price = price;
 		this.details = details;
 		this.acquired = acquired;
+		this.auctionDate = auctionDate;
 		this.imageCount = imageCount;
 		this.condition = condition;
 	}
@@ -155,6 +157,16 @@ public class Vehicle
 	public void setAcquired(String acquired)
 	{
 		this.acquired = acquired;
+	}
+
+	public int getAuctionDate()
+	{
+		return auctionDate;
+	}
+
+	public void setAuctionDate(int auctionDate)
+	{
+		this.auctionDate = auctionDate;
 	}
 
 	public int getImageCount()
