@@ -17,7 +17,7 @@ X >> The inventory should have a minimum 3 cars with idle days of 120+.
 O >> The inventory should have an option to replenish the inventory by adding pictures and details of a car.
 O >> The application should have a reporting section which displays information about all transactions made, including the person who purchased the car. 
 O >> This reporting page should order transactions by date starting with the most recent purchase.
-O >> A user should also be able to search for a type (model) car from the inventory.
+X >> A user should also be able to search for a type (model) car from the inventory.
 O >> The inventory should only have cars available to be sold. If a car has been sold the inventory should reflect this behavior. 
 
 Note:
@@ -26,6 +26,9 @@ You are required to upload your project on github, then submit your github proje
 
 Bonus:
 Add functionality to add a new car to the inventory including a display photo of the car. 
+
+
+MENU UI OPTIONS ---> INDEX | NEW | USED | MANAGER | REPORTS | SEARCH (RESULTS)
 
 
 |||| CAR DEALERSHIP WEBSITE ||||
